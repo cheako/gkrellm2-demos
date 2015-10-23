@@ -1,10 +1,10 @@
 These are some GKrellM 2.0  plugin demos.
 Demo4 uses functions first implemented in 2.0.0-pre0.10
 
-for demo1 - demo3, use the build script:
+for demo1 - demo3, use make:
 
-  ./build demo1
-  gkrellm -p demo1.so
+  make demo1.so;   # Builds demo1.o and demo1.so
+  make demo1.test; # Builds and executed demo1
 
 and so on for demo2, demo3, ...
 
