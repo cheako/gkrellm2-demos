@@ -1,0 +1,20 @@
+These are some GKrellM 2.0  plugin demos.
+Demo4 uses functions first implemented in 2.0.0-pre0.10
+
+for demo1 - demo3, use the build script:
+
+  ./build demo1
+  gkrellm -p demo1.so
+
+and so on for demo2, demo3, ...
+
+For demo4,
+  cd to demo4
+  make
+  gkrellm -p demo4.so
+
+Demo4 demonstrates theming at the plugin level, run
+  gkrellm -p demo4.so -theme test-theme
+
+And then go to the Config->Themes and select the 0 and 1 theme
+alternatives.

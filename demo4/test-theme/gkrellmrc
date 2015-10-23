@@ -1,0 +1,16 @@
+# GKrellM 2.0.0-pre0.10a gkrellmrc for the demo4 test-theme.
+#
+
+theme_alternatives = 1
+
+#reposition things
+set_string demo4_rim_button_position "2 4 0 0 l"
+set_string demo4_center_button_position "7 9 0 0 l"
+
+StyleMeter demo4.slider.krell_yoff = 0
+StyleMeter demo4.slider.krell_left_margin = 0
+
+StyleMeter demo4.A_krell.krell_yoff = 10
+
+StyleMeter demo4.B_krell.krell_yoff = 15
+

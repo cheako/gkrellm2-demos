@@ -1,0 +1,40 @@
+# GKrellM 2.0.0-pre0.10a gkrellmrc_1 for the demo4 test-theme.
+#
+# Really distort the rim buttom just because I can.  And center the button
+# positions.  This is just a demo of theming so I'm not trying for any kind
+# of practical layout.
+
+set_string demo4_rim_button_position "-30 2 60 0 c"
+set_string demo4_center_button_position "-5 7 0 0 c""
+
+# Make room at the bottom by setting the margin, and put the slider
+# krell at the bottom panel edge so it will occupy some of the margin space.
+StyleMeter demo4.bottom_margin = 5
+
+StyleMeter demo4.slider.krell_yoff = -2
+StyleMeter demo4.slider.krell_left_margin = 0
+StyleMeter demo4.slider.krell_right_margin = 0
+
+# This alternative has its own krell slider image, so set the image parameters.
+# x_hot is ignored for a bar-mode krell.  These will apply for the demo4
+# plugin and for the volume plugin if it is running.
+krell_slider_depth = 1
+#krell_slider_x_hot = 49
+krell_slider_expand = bar-mode
+
+StyleMeter demo4.slider.krell_depth = 1
+StyleMeter demo4.slider.krell_expand = bar-mode
+
+# Make the A_krell move in the center region of the rim_button
+StyleMeter demo4.A_krell.krell_yoff = 9
+StyleMeter demo4.A_krell.krell_left_margin = 10
+StyleMeter demo4.A_krell.krell_right_margin = 10
+
+# Move the B_krell up into the upper right corner.
+StyleMeter demo4.B_krell.krell_yoff = 0
+StyleMeter demo4.B_krell.krell_left_margin = 50
+StyleMeter demo4.B_krell.krell_right_margin = 0
+
+# In case the volume plugin is running, adjust it for the slider krell.
+StyleMeter volume.label_position = 0
+StyleMeter volume.bottom_margin = 6

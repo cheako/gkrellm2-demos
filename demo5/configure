@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# Check to see if gkrellmd development headers are installed.
+# There is no need to run this configure before doing a make.
+#
+
+GLIB_INCLUDE=`pkg-config --cflags glib-2.0`
+GLIB_LIBS=`pkg-config --libs glib-2.0`
+
+for i
+do
+	if [ "$i" = "--with-glib12" ]
+	then
+		GLIB_INCLUDE=`glib-config --cflags`
+		GLIB_LIBS=`glib-config --libs`
+	fi
+done
+
+
+PKG_INCLUDE=`pkg-config gkrellm --cflags --silence-errors`
+PKG_LIBS=`pkg-config gkrellm --libs --silence-errors`
+
+if [ "$PKG_INCLUDE" = "" ]
+then
+	PKG_INCLUDE=$GLIB_INCLUDE
+fi
+
+if [ "$PKG_LIBS" = "" ]
+then
+	PKG_LIBS=$GLIB_LIBS
+fi
+
+
+rm -f configure.h configure.log test test.o test.c
+
+touch configure.h
+
+CC=${CC-gcc}
+
+exec 5>./configure.log
+
+
+
+# ---------------------- gkrellmd check ----------------------
+echo "Checking for gkrellmd... " 1>& 5
+
+cat << EOF > test.c
+#include <gkrellm2/gkrellmd.h>
+
+int main()
+	{
+#if defined(GKRELLMD_VERSION_MAJOR)
+	return 0;
+#else
+	return 1;
+#endif
+	}
+
+EOF
+
+# echo $CC ${PKG_INCLUDE} -c test.c -o test.o
+
+$CC ${PKG_INCLUDE} -c test.c -o test.o 2>& 5
+$CC test.o -o test ${PKG_LIBS}  2>& 5
+
+if [ -e ./test ] && ./test
+then
+	echo "OK, defining HAVE_GKRELLMD" 1>& 5
+	echo "" 1>& 5
+	echo "#define HAVE_GKRELLMD 1" >> configure.h
+else
+	echo "gkrellmd server support not included.  Can't find gkrellmd.h?" 1>& 5
+	echo "" 1>& 5
+fi
+# --------------- end of gkrellmd check ------------------------
+
+
+
+#-------------------------------------------------------------------
+
+rm -f test test.o test.c
+exit 0

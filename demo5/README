@@ -1,0 +1,138 @@
+
+Demo5 is a sample client/server gkrellm plugin and requires GKrellM 2.2.0.
+--------------------------------------------------------------------------
+
+The comments in the source files are the tutorial you need to read so
+here I'll just have a quick overview:
+	A client/server capable gkrellm plugin will have two plugin .so files.
+
+	1) One will be a gkrellm plugin.so installed in the normal gkrellm plugin
+	locations.  This plugin.so will have in its gkrellm_init_plugin() function
+	a check to see if gkrellm is getting server data from its server plugin
+	counterpart.  This can only happen if gkrellm is run in client mode and
+	the server plugin is installed and enabled on the gkrellmd server.  The
+	plugin then uses a function pointer to select which function it will call
+	for reading its data.  The choice will be between a function that reads
+	server sent data lines and another function that can read raw data values
+	on the local machine.  The second choice will be made when gkrellm is
+	not run in client mode and it can also be made if gkrellm is run in client
+	mode and the server plugin counterpart is not enabled.
+
+	2) The second .so file will be, say, plugind.so which if enabled will be
+	loaded into the gkrellmd server.  This plugin will use the same raw data
+	reading function that the above plugin.so can use.  The install locations
+	for gkrellmd server plugins will be similar to normal gkrellm plugin
+	locations except that "-gkrellmd" is appended.  For example:
+	     /usr/local/lib/gkrellm2/plugins-gkrellmd
+	A server plugin then reads data and transmits it over the network to be
+	received by its client plugin.  Installed server plugins are not
+	automatically enabled and must be enabled by having a "plugin-enable"
+	line added in a gkrellmd.conf file.  For testing it can be command
+	line enabled with the -pe option.
+
+	It is not uncommon for gkrellmd servers to be installed on machines
+	that have glib 1.2 only installed, so it will be nice to have a compile
+	option for building server plugins using glib 1.2.  This demo5 has
+	a Makefile which permits selecting glib 1.2 and which allows for
+	building the server plugin only by entering "make server" and
+	"make install-server" since these machines may also not have gtk or
+	xlibs installed.
+
+
+
+To see how to build/install and all the make options available, run:
+
+    make help
+
+
+
+Testing a Client/Server Plugin
+------------------------------
+At least gkrellm 2.2.0 and gkrellmd 2.2.0 must be installed.
+
+You may not want to actually install since this is a demo, and if you
+are testing a plugin under development you also want to be able to
+test without installing.  So to test without installing (and to test
+on a single machine, ie, no separate server machine is required), 
+do this in the compile directory:
+
+1) Load the demo5d server into gkrellmd and dump a log of the load:
+      $ gkrellmd -p demo5d.so -plog
+
+   a) Run gkrellm in client mode on the same machine:
+      $ gkrellm -p demo5.so -s localhost
+
+   You should see the demo5 panel and its label should be "demo5" which
+   indicates the plugin is receiving its data from the expected source which
+   in client mode is from the server.
+
+   b) To verify the gkrellmd server is sending demo5 data, run for about
+   10 seconds:
+      $ gkrellm -p demo5.so -s localhost -d 0x1000 > somelog
+
+   and search for "demo5" lines in the somelog.
+
+   c) To verify the demo5 client plugin is switching to collecting data from
+   from the gkrellmd server, run:
+      $ gkrellm -p demo5.so -s localhost -debug99
+
+   and you'll get output:
+
+      demo5: gkrellm_init_plugin()
+      demo5_client_setup: version 1 0 0
+      demo5_client_setup: available
+      demo5: have client mode plugins
+      demo5: demo5d server is available.
+      demo5_data_from_server: value 19
+      ...
+
+
+2) Run the gkrellmd server without the demo5d plugin loaded:
+	$ gkrellmd
+
+   Run gkrellm in client mode the same way as in 1-a):
+
+   The demo5 panel label should be "local: demo5" which indicates the demo5
+   gkrellm plugin knows it is being run on a gkrellm in client mode, but it
+   is not getting data from the server.  It is getting data via its local
+   data collection function and is flagging that the data is not server
+   based by putting the "local" into the label.
+
+   If you run gkrellm as in 1-c) the output will be:
+
+      demo5: gkrellm_init_plugin()
+      demo5: have client mode plugins
+      demo5: demo5d server is not available.
+
+
+3) If you just run the plugin in gkrellm not in client mode:
+	gkrellm -p demo5.so
+
+   The panel label will again be just "demo5" indicating that the demo5
+   plugin is getting its data from the expected source which is local when
+   not in client mode.
+
+
+
+But if you do install the demo5d.so server plugin, try these gkrellmd runs:
+
+1) List installed plugins and exit:
+	gkrellmd -plist
+
+2) Dump a log of the plugin enable process:
+	gkrellmd -plog
+
+3) Now enable the plugin:
+	gkrellmd -plog -pe demo5d
+
+4) Edit a gkrellmd.conf and enable the plugin there by adding the line:
+	plugin-enable demo5d
+
+   And then run gkrellmd again:
+	gkrellmd -plog
+
+The gkrellmd.conf file may be any of:
+
+   ~/.gkrellmd.conf
+   /usr/local/etc/gkrellmd.conf
+   /etc/gkrellmd.conf
